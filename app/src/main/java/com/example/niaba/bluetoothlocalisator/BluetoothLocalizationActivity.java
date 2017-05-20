@@ -202,6 +202,7 @@ public class BluetoothLocalizationActivity extends Activity{
                     builder.setPositiveButton(android.R.string.ok, null);
                     builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
 
+
                         @Override
                         public void onDismiss(DialogInterface dialog) {
                         }
@@ -240,7 +241,7 @@ public class BluetoothLocalizationActivity extends Activity{
         });
     }
 
-    public Point getCoordinateWithBeacon(Point beacon_a,float dB_a,Point beacon_b, float dB_b,Point beacon_c,float dB_c){
+    public Point getCoordinateWithBeacon(Point beacon_a,float dB_a,Point beacon_b, float dB_b,Point beacon_c,float dB_c) {
         float W, Z, x, y, y2;
 
         W = (dB_a*dB_a - dB_b*dB_b) - (beacon_a.x*beacon_a.x - beacon_a.y*beacon_a.y )+
@@ -250,7 +251,7 @@ public class BluetoothLocalizationActivity extends Activity{
                 (beacon_c.x*beacon_c.x + beacon_c.y*beacon_c.y);
 
         x = (W * (beacon_c.y - beacon_b.y) - Z * (beacon_b.y - beacon_a.y)) /
-                (2 * ((beacon_b.x-beacon_a.x)*(beacon_c.y-beacon_b.y) - (beacon_c.x-beacon_b.x)));
+                (2 * ((beacon_b.x-beacon_a.x)*(beacon_c.y-beacon_b.y) - (beacon_c.x-beacon_b.x)*(beacon_b.y-beacon_a.y)));
 
         y =  (W - 2*x*(beacon_b.x - beacon_a.x)) / (2 *(beacon_b.y - beacon_a.y));
 
