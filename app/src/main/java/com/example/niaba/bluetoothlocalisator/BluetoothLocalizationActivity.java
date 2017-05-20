@@ -21,6 +21,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,14 +33,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.TimeZone;
 import java.util.UUID;
 
 @TargetApi(21)
@@ -58,9 +64,14 @@ public class BluetoothLocalizationActivity extends Activity{
 
     HashMap<String,Integer> beacons;
 
+    private HashMap<String,Point> beacons_pos;
+
+
     private final static int REQUEST_ENABLE_BT = 1;
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
 
+    SimpleDateFormat sdf ;
+    String currentDateandTime ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,6 +82,11 @@ public class BluetoothLocalizationActivity extends Activity{
                     Toast.LENGTH_SHORT).show();
             finish();
         }
+
+        sdf = new SimpleDateFormat("HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getDefault());
+
+
         peripheralTextView = (TextView) findViewById(R.id.PeripheralTextView);
         peripheralTextView.setMovementMethod(new ScrollingMovementMethod());
 
@@ -89,9 +105,6 @@ public class BluetoothLocalizationActivity extends Activity{
             }
         });
         stopScanningButton.setVisibility(View.INVISIBLE);
-
-
-
 
         btManager = (BluetoothManager) getSystemService(BLUETOOTH_SERVICE);
         btAdapter = btManager.getAdapter();
@@ -115,6 +128,11 @@ public class BluetoothLocalizationActivity extends Activity{
             builder.show();
         }
         beacons = new HashMap<>();
+        beacons_pos = new HashMap<>();
+        beacons_pos.put("Carrefour_1",new Point(0,0));
+        beacons_pos.put("Carrefour_2",new Point(100,0));
+        beacons_pos.put("Carrefour_3",new Point(0,100));
+
     }
 
     // Device scan callback.
@@ -138,9 +156,29 @@ public class BluetoothLocalizationActivity extends Activity{
                     }else{
                         beacons.put(device_name, device_rssi);
                     }
-                    peripheralTextView.append("Device Name: " + device_name+ " rssi: " + device_rssi + "\n");
+                    currentDateandTime = sdf.format(new Date());
+                    peripheralTextView.append(currentDateandTime +" Device Name: " + device_name+ " rssi: " + device_rssi + "\n");
                 Log.d(device_name, ""+device_rssi);
             }
+
+            ArrayList<Point> points = new ArrayList<>(3);
+            ArrayList<Integer> powers = new ArrayList<>(3);
+
+
+            if(beacons.keySet().size() >= beacons_pos.keySet().size()){
+                for(String s: beacons.keySet()){
+                    if(beacons_pos.containsKey(s)){
+                        points.add(beacons_pos.get(s));
+                        powers.add(beacons.get(s));
+                    }
+                }
+            }
+            if (points.size()>= 3 && powers.size() >= 3) {
+                Point current_pos = getCoordinateWithBeacon(points.get(0), powers.get(0),
+                        points.get(1), powers.get(1), points.get(2), powers.get(2));
+                peripheralTextView.append(currentDateandTime + " Position: (" + current_pos.x + "," + current_pos.y + ") \n");
+            }
+
 
             // auto scroll for text view
             final int scrollAmount = peripheralTextView.getLayout().getLineTop(peripheralTextView.getLineCount()) - peripheralTextView.getHeight();
@@ -202,6 +240,26 @@ public class BluetoothLocalizationActivity extends Activity{
         });
     }
 
+    public Point getCoordinateWithBeacon(Point beacon_a,float dB_a,Point beacon_b, float dB_b,Point beacon_c,float dB_c){
+        float W, Z, x, y, y2;
+
+        W = (dB_a*dB_a - dB_b*dB_b) - (beacon_a.x*beacon_a.x - beacon_a.y*beacon_a.y )+
+                (beacon_b.x*beacon_b.x + beacon_b.y*beacon_b.y);
+
+        Z = (dB_b*dB_b - dB_c*dB_c) - (beacon_b.x*beacon_b.x - beacon_b.y*beacon_b.y )+
+                (beacon_c.x*beacon_c.x + beacon_c.y*beacon_c.y);
+
+        x = (W * (beacon_c.y - beacon_b.y) - Z * (beacon_b.y - beacon_a.y)) /
+                (2 * ((beacon_b.x-beacon_a.x)*(beacon_c.y-beacon_b.y) - (beacon_c.x-beacon_b.x)));
+
+        y =  (W - 2*x*(beacon_b.x - beacon_a.x)) / (2 *(beacon_b.y - beacon_a.y));
+
+        y2 = (Z - 2*x*(beacon_c.x - beacon_b.x)) / (2 *(beacon_c.y - beacon_b.y));
+
+        y = (y + y2) / 2;
+
+        return new Point((int)x,(int)y);
+    }
 
 
 }
