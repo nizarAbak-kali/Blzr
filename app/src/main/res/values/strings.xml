@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">BluetoothLocalisator</string>
     <string name="ble_not_supported">\"Bluetooth not supported\"</string>
+    <string name="localize_me">localize me</string>
+    <string name="talk_to_me">talk to me</string>
 </resources>
