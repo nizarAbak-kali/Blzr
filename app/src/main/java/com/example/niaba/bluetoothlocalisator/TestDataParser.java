@@ -12,11 +12,11 @@ import java.util.ArrayList;
  * Created by niaba on 20/05/17.
  */
 // parser pour recup des donner depuis le fichier de test.txt
-public class TestDataParser {
-    private final File test_file = new File("STORE_CATERGORY_LOCALIZATION.txt");
-    private FileInputStream fis = null;
+public  class TestDataParser {
+    private static final File test_file = new File("STORE_CATERGORY_LOCALIZATION.txt");
+    private static FileInputStream fis = null;
 
-    public ArrayList<Products> getProducts() {
+    public static ArrayList<Products> getProducts() {
         ArrayList<Products> products_list = new ArrayList<>();
         BufferedReader br = null;
         try {

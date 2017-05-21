@@ -17,7 +17,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String UTTERANCE_ID_CHATBOT = "utterance_id_chatbot";
     public static final String MAIN_ACTIVITY = "MainActivity";
 
-
     private TextToSpeech TTS;
 
     Button localize_button;
@@ -55,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         TTS = new TextToSpeech(MainActivity.this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
@@ -80,8 +78,6 @@ public class MainActivity extends AppCompatActivity {
                 if(recognizerResult == null) {
                     return;
                 }
-
-                Log.e("Testing", recognizerResult);
 
                 Intent parseIntent = new Intent(MainActivity.this, ChatBotActivity.class);
                 parseIntent.putExtra(ChatBotActivity.SENTENCE_TO_PARSE, recognizerResult);
