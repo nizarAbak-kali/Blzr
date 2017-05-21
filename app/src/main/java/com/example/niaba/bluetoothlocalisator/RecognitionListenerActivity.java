@@ -29,7 +29,7 @@ public class RecognitionListenerActivity extends AppCompatActivity implements Re
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recognition_listener);
+        //setContentView(R.layout.activity_recognition_listener);
 
         speech = SpeechRecognizer.createSpeechRecognizer(this);
         speech.setRecognitionListener(this);

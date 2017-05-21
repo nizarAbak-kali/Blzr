@@ -28,7 +28,7 @@ public class ChatBotActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat_bot);
+        //setContentView(R.layout.activity_chat_bot);
 
         String toParse = getIntent().getStringExtra(SENTENCE_TO_PARSE);
 
