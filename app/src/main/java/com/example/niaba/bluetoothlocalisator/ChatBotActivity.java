@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -45,8 +44,9 @@ public class ChatBotActivity extends AppCompatActivity {
         String result = null;
 
         String wish = findFirstAmong(query,  "trouv", "veux", "voudr");
+
         if (wish != null) {
-            ArrayList<Products> productsArrayList = new ArrayList<>(); // TODO: Fetch Nizar's stuff
+            ArrayList<Products> productsArrayList = TestDataParser.getProducts(); // TODO: Fetch Nizar's stuff
             findProduct(query.substring(query.indexOf(wish)), productsArrayList);
         }
 
@@ -65,20 +65,18 @@ public class ChatBotActivity extends AppCompatActivity {
         String toParse = getIntent().getStringExtra(SENTENCE_TO_PARSE);
 
         Log.e(CHAT_BOT, "Parsing " + toParse);
-        Toast.makeText(this, "ChatBot " + toParse, Toast.LENGTH_SHORT).show();
 
         Intent resultIntent = new Intent();
         String result = answer(toParse);
 
         if (result == null) {
             setResult(CHATBOT_ACTIVITY_RESULT_NOT_OK, resultIntent);
-        }
-        else {
+        } else {
             resultIntent.putExtra(CHATBOT_RESULT, result);
             setResult(CHATBOT_ACTIVITY_RESULT, resultIntent);
         }
+
         finish();
     }
-
 
 }
