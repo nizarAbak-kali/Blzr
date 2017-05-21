@@ -71,4 +71,16 @@ class Products {
     public void setSTORE_KEY(String STORE_KEY) {
         this.STORE_KEY = STORE_KEY;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if(obj instanceof Products) {
+            return (this.HYP_GRP_CLASS_DESC.equals(((Products) obj).HYP_GRP_CLASS_DESC));
+        } else if (obj instanceof String) {
+            return (this.HYP_GRP_CLASS_DESC.contains((CharSequence) obj));
+        }
+
+        return super.equals(obj);
+    }
 }

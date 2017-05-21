@@ -132,14 +132,12 @@ public class BluetoothLocalizationActivity extends Activity{
         beacons_pos.put("Carrefour_1",new Point(0,0));
         beacons_pos.put("Carrefour_2",new Point(100,0));
         beacons_pos.put("Carrefour_3",new Point(0,100));
-
     }
 
     // Device scan callback.
     private ScanCallback leScanCallback = new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
-
 
             String device_name = result.getDevice().getName();
             int device_rssi = result.getRssi();
@@ -151,9 +149,9 @@ public class BluetoothLocalizationActivity extends Activity{
                     return;
                 }
                 if(res[0].equals("Carrefour")){
-                    if(!beacons.containsKey(device_name)){
+                    if (!beacons.containsKey(device_name)) {
                         beacons.put(device_name, device_rssi);
-                    }else{
+                    } else {
                         beacons.put(device_name, device_rssi);
                     }
                     currentDateandTime = sdf.format(new Date());
@@ -161,24 +159,26 @@ public class BluetoothLocalizationActivity extends Activity{
                 Log.d(device_name, ""+device_rssi);
             }
 
+            /* Fetch information on 3 devices that we shall use for trilateration */
             ArrayList<Point> points = new ArrayList<>(3);
             ArrayList<Integer> powers = new ArrayList<>(3);
 
-
-            if(beacons.keySet().size() >= beacons_pos.keySet().size()){
-                for(String s: beacons.keySet()){
-                    if(beacons_pos.containsKey(s)){
-                        points.add(beacons_pos.get(s));
-                        powers.add(beacons.get(s));
-                    }
+            if (beacons.keySet().size() >= beacons_pos.keySet().size()) {
+                for (String s: beacons.keySet()) {
+                    points.add(beacons_pos.get(s));
+                    powers.add(beacons.get(s));
                 }
             }
-            if (points.size()>= 3 && powers.size() >= 3) {
-                Point current_pos = getCoordinateWithBeacon(points.get(0), powers.get(0),
-                        points.get(1), powers.get(1), points.get(2), powers.get(2));
-                peripheralTextView.append(currentDateandTime + " Position: (" + current_pos.x + "," + current_pos.y + ") \n");
-            }
 
+            final int min_trilat_devices = 3;
+
+            if (points.size() >= min_trilat_devices && powers.size() >= min_trilat_devices) {
+                Point current_pos = getCoordinateWithBeacon(points.get(0), powers.get(0),
+                                                            points.get(1), powers.get(1),
+                                                            points.get(2), powers.get(2));
+                peripheralTextView.append(currentDateandTime + " Position: (" + current_pos.x +
+                                          "," + current_pos.y + ") \n");
+            }
 
             // auto scroll for text view
             final int scrollAmount = peripheralTextView.getLayout().getLineTop(peripheralTextView.getLineCount()) - peripheralTextView.getHeight();
@@ -244,14 +244,13 @@ public class BluetoothLocalizationActivity extends Activity{
     public Point getCoordinateWithBeacon(Point beacon_a,float dB_a,Point beacon_b, float dB_b,Point beacon_c,float dB_c) {
         float W, Z, x, y, y2;
 
-        W = (dB_a*dB_a - dB_b*dB_b) - (beacon_a.x*beacon_a.x - beacon_a.y*beacon_a.y )+
-                (beacon_b.x*beacon_b.x + beacon_b.y*beacon_b.y);
-
-        Z = (dB_b*dB_b - dB_c*dB_c) - (beacon_b.x*beacon_b.x - beacon_b.y*beacon_b.y )+
-                (beacon_c.x*beacon_c.x + beacon_c.y*beacon_c.y);
+        W = dB_a * dB_a - dB_b * dB_b - beacon_a.x * beacon_a.x - beacon_a.y * beacon_a.y +
+                beacon_b.x * beacon_b.x + beacon_b.y * beacon_b.y;
+        Z = dB_b * dB_b - dB_c * dB_c - beacon_b.x * beacon_b.x - beacon_b.y * beacon_b.y +
+                beacon_c.x * beacon_c.x + beacon_c.y * beacon_c.y;
 
         x = (W * (beacon_c.y - beacon_b.y) - Z * (beacon_b.y - beacon_a.y)) /
-                (2 * ((beacon_b.x-beacon_a.x)*(beacon_c.y-beacon_b.y) - (beacon_c.x-beacon_b.x)*(beacon_b.y-beacon_a.y)));
+                (2 * ((beacon_b.x - beacon_a.x) * (beacon_c.y - beacon_b.y) - (beacon_c.x - beacon_b.x) * (beacon_b.y - beacon_a.y)));
 
         y =  (W - 2*x*(beacon_b.x - beacon_a.x)) / (2 *(beacon_b.y - beacon_a.y));
 
