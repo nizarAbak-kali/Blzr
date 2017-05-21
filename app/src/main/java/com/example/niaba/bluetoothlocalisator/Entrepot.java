@@ -134,6 +134,15 @@ public class Entrepot {
         goal.setGoal(true);
     }
 
+    public void setStart(int x_coord, int y_coord) {
+
+        start.setGoal(false);
+        start = content[x_coord][y_coord];
+        start.setGoal(true);
+
+    }
+
+
     /**
      * clear the previous visits
      */
@@ -147,7 +156,6 @@ public class Entrepot {
             }
         algo.reCompute();
     }
-
 
     ////// getters and setters
     public int getWidth() {

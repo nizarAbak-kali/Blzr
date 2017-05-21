@@ -24,7 +24,6 @@ public class RecognitionListenerActivity extends AppCompatActivity implements Re
     private String TAG = "RecognizerListener";
     public static final int RECOGNIZER_ACTIVITY_RESULT_OK = 42;
     public static final int RECOGNIZER_ACTIVITY_RESULT_NOT_OK = 51;
-    private static final int MY_REQUEST_CODE = 51;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,12 +53,8 @@ public class RecognitionListenerActivity extends AppCompatActivity implements Re
         /*
             Since Android 6.0 need to ask the user to approve the permission at run time
          */
+        speech.startListening(recognizerIntent);
 
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED) {
-            ActivityCompat.requestPermissions(this, PERMISSIONS, MY_REQUEST_CODE);
-        } else {
-            speech.startListening(recognizerIntent);
-        }
     }
 
     @Override
@@ -127,6 +122,7 @@ public class RecognitionListenerActivity extends AppCompatActivity implements Re
 
         Log.e(TAG, message);
         setResult(RECOGNIZER_ACTIVITY_RESULT_NOT_OK);
+        speech.destroy();
         finish();
     }
 
@@ -150,16 +146,4 @@ public class RecognitionListenerActivity extends AppCompatActivity implements Re
 
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if(requestCode == MY_REQUEST_CODE && permissions.equals(this.PERMISSIONS)) {
-            if (grantResults.length > 0
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                speech.startListening(recognizerIntent);
-            }
-        }
-
-    }
 }
