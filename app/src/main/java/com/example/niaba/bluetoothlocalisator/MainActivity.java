@@ -15,6 +15,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int REQUEST_CODE_RECOGNITION_RESULT = 42;
     public static final int REQUEST_CODE_PARSING_RESULT = 51;
     private static final String UTTERANCE_ID_CHATBOT = "utterance_id_chatbot";
+    public static final String MAIN_ACTIVITY = "MainActivity";
 
 
     private TextToSpeech TTS;
@@ -34,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         talk_me_button = (Button) findViewById(R.id.button2);
 
         if (localize_button == null|| talk_me_button == null){
-            Log.e("MainActivity:OnCreate", "bouton pas init");
+            Log.e(MAIN_ACTIVITY, "bouton pas init");
         }
 
         localize_button.setOnClickListener(new View.OnClickListener() {
@@ -58,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         TTS = new TextToSpeech(MainActivity.this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
-                Log.e("MainActivity", "TTS onInit");
+                Log.e(MAIN_ACTIVITY, "TTS onInit");
             }
         });
     }
@@ -87,11 +88,16 @@ public class MainActivity extends AppCompatActivity {
 
                 startActivityForResult(parseIntent, REQUEST_CODE_PARSING_RESULT);
                 break;
+
             case REQUEST_CODE_PARSING_RESULT:
                 String resultChatBot = data.getStringExtra(ChatBotActivity.CHATBOT_RESULT);
-                Log.e("MainActivity", "chat bot speaking");
+                Log.e(MAIN_ACTIVITY, "chat bot speaking");
                 TTS.speak(resultChatBot, TextToSpeech.QUEUE_FLUSH, null, UTTERANCE_ID_CHATBOT);
 
+                break;
+
+            default:
+                Log.e(MAIN_ACTIVITY, "unknown request code");
                 break;
         }
 
